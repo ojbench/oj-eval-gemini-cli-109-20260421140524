@@ -25,9 +25,11 @@ int main() {
         return 0;
     }
 
-    // dp[i][j][0]: i and j are connected by an edge, and they form a spanning tree on i...j
-    // dp[i][j][1]: i and j are connected by a path, and they form a spanning tree on i...j
-    static long long dp[505][505][2];
+    // dp[i][j][0]: Number of non-crossing spanning trees on the interval [i, j]
+    // such that the edge (i, j) is present in the tree.
+    // dp[i][j][1]: Number of non-crossing spanning trees on the interval [i, j].
+    // In this state, i and j are guaranteed to be connected because it's a spanning tree.
+    static int dp[505][505][2];
 
     for (int i = 1; i <= n; ++i) {
         dp[i][i][1] = 1;
@@ -37,7 +39,9 @@ int main() {
         for (int i = 1; i <= n - len + 1; ++i) {
             int j = i + len - 1;
             
-            // Calculate dp[i][j][0]
+            // Calculate dp[i][j][0]: trees on [i, j] where (i, j) is an edge.
+            // We split the interval at k, where [i, k] and [k+1, j] are two sub-trees
+            // that are joined by the edge (i, j).
             if (a[i][j]) {
                 long long sum = 0;
                 for (int k = i; k < j; ++k) {
@@ -46,7 +50,10 @@ int main() {
                 dp[i][j][0] = sum;
             }
             
-            // Calculate dp[i][j][1]
+            // Calculate dp[i][j][1]: all non-crossing spanning trees on [i, j].
+            // We pick the "last" edge incident to j, say (k, j).
+            // Then [i, k] forms a spanning tree and [k, j] forms a spanning tree
+            // where (k, j) is an edge.
             long long sum = 0;
             for (int k = i; k < j; ++k) {
                 sum = (sum + (long long)dp[i][k][1] * dp[k][j][0]) % MOD;
